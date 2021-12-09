@@ -1,0 +1,244 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>cn.toseektech</groupId>
+	<artifactId>nacos-gateway</artifactId>
+	<version>1.0.0</version>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.2.8.RELEASE</version>
+	</parent>
+
+	<properties>
+		<app-port>80</app-port>
+		<java.version>1.8</java.version>
+		<app-name>${project.artifactId}</app-name>
+		<start-class>cn.toseektech.gateway.NacosGatewayApplication</start-class>
+		<gateway.version>2.2.5.RELEASE</gateway.version>
+		<gateway.sentinel.version>2.2.1.RELEASE</gateway.sentinel.version>
+		<nacos.boot.config.version>0.2.7</nacos.boot.config.version>
+		<alibaba.sentienl.version>2.2.1.RELEASE</alibaba.sentienl.version>
+		<sentienl.nacos.version>1.7.0</sentienl.nacos.version>
+		<feign.version>2.2.4.RELEASE</feign.version>
+	</properties>
+
+	<dependencies>
+	
+		<dependency>
+			<groupId>cn.toseektech</groupId>
+			<artifactId>common</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>cn.toseektech</groupId>
+			<artifactId>login-core</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<!-- Nacos 注册中心 -->
+		<dependency>
+			<groupId>com.alibaba.cloud</groupId>
+			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+			<version>2.2.1.RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Nacos 配置中心 -->
+		<dependency>
+			<groupId>com.alibaba.boot</groupId>
+			<artifactId>nacos-config-spring-boot-starter</artifactId>
+			<version>${nacos.boot.config.version}</version>
+		</dependency>
+
+		<!-- springcloud gateway -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-gateway</artifactId>
+			<version>${gateway.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId> org.springframework.boot </groupId>
+			<artifactId> spring-boot-starter-logging </artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+			<version>${feign.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
+		
+			<!-- zuul sentinel nacos 整合限流 -->
+		<dependency>
+			<groupId>com.alibaba.cloud</groupId>
+			<artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>
+			<version>${gateway.sentinel.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba.cloud</groupId>
+			<artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+			<version>${alibaba.sentienl.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba.csp</groupId>
+			<artifactId>sentinel-datasource-nacos</artifactId>
+			<version>${sentienl.nacos.version}</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<finalName>${app-name}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<!-- 绑定source插件到Maven的生命周期,并在生命周期后执行绑定的source的goal -->
+				<executions>
+					<execution>
+						<!-- 绑定source插件到Maven的生命周期 -->
+						<phase>compile</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<configuration>
+					<useDefaultDelimiters>false</useDefaultDelimiters>
+					<delimiters>
+						<delimiter>@{*}</delimiter>
+					</delimiters>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+
+			<!-- springboot 启动指定main -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+		</plugins>
+
+		<resources>
+			<!-- 打包前先排除所有文件) -->
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>*</exclude>
+				</excludes>
+			</resource>
+
+
+			<!-- 打包特定配置文件到class目录 -->
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>bootstrap.properties</include>
+					<include>logback-spring.xml</include>
+					<include>docker/Dockerfile</include>
+					<include>mappers/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<properties>
+				<profileActive>dev</profileActive>
+				<nacos.namespace>1481937d-b83c-429b-a5d2-09dde1ceeaa7
+				</nacos.namespace>
+				<nacos.address>47.114.161.66:8847,47.114.161.66:8848,47.114.161.66:8849
+				</nacos.address>
+				<jvm.params>
+					"-Xms512m -Xmx512m -Xmn256m -XX:MetaspaceSize=64m \
+					-XX:MaxMetaspaceSize=128m \
+					-XX:+HeapDumpOnOutOfMemoryError \
+					-XX:HeapDumpPath=/logs/oom/@{app-name} \
+					-XX:+UseConcMarkSweepGC \
+					-XX:+PrintGCDetails \
+					-Xloggc:/logs/gc/@{app-name}/gc.log"
+				</jvm.params>
+			</properties>
+			<activation>
+				<!--默认激活 -->
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>test</id>
+			<properties>
+				<profileActive>test</profileActive>
+				<nacos.namespace>ad5b173f-aa00-46fc-880e-f47608383d1a
+				</nacos.namespace>
+				<nacos.address>47.114.161.66:8847,47.114.161.66:8848,47.114.161.66:8849
+				</nacos.address>
+				<jvm.params>
+					"-Xms512m -Xmx512m -Xmn256m -XX:MetaspaceSize=64m \
+					-XX:MaxMetaspaceSize=128m \
+					-XX:+HeapDumpOnOutOfMemoryError \
+					-XX:HeapDumpPath=/logs/oom/@{app-name} \
+					-XX:+UseConcMarkSweepGC \
+					-XX:+PrintGCDetails \
+					-Xloggc:/logs/gc/@{app-name}/gc.log"
+				</jvm.params>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<profileActive>prod</profileActive>
+			</properties>
+		</profile>
+	</profiles>
+
+	<distributionManagement>
+		<repository>
+			<id>nexus-releases</id>
+			<url>http://www.nexus.toseektech.cn:8081/repository/maven-public/
+			</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<url>http://www.nexus.toseektech.cn:8081/repository/maven-snapshots/
+			</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

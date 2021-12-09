@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{96} [%line] - %msg%n"/>
+    <property name="APP_NAME" value="@{app-name}"></property>
+    <property name="LOG_HIS_MAX" value="15"></property>
+    
+    <springProfile name="dev,dev1">
+        <appender name="DEV" class="ch.qos.logback.core.ConsoleAppender">
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>DEBUG</level>
+            </filter>
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+        <logger name="cn.toseektech" level="DEBUG" additivity="false">
+            <appender-ref ref="DEV"/>
+        </logger> 
+        <logger name="org.apache.dubbo" level="INFO" additivity="false">
+            <appender-ref ref="DEV"/>
+        </logger>
+              
+        <root level="INFO">
+            <appender-ref ref="DEV"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="test,test1">
+        <property name="LOG_PATH" value="/var/logs/${APP_NAME}"/>
+        <appender name="TEST" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>DEBUG</level>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <FileNamePattern>${LOG_PATH}/info.%d{yyyy-MM-dd}.log</FileNamePattern>
+                <maxHistory>${LOG_HIS_MAX}</maxHistory>
+                <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            </rollingPolicy>
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+        <logger name="cn.toseektech" level="DEBUG" additivity="false">
+            <appender-ref ref="TEST"/>
+        </logger>
+         <logger name="org.apache.dubbo" level="DEBUG" additivity="false">
+            <appender-ref ref="TEST"/>
+        </logger>
+        <root level="INFO">
+            <appender-ref ref="TEST"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="pre,beta">
+        <property name="LOG_PATH" value="/var/logs/${APP_NAME}"/>
+        <appender name="PRE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>INFO</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <FileNamePattern>${LOG_PATH}/info.%d{yyyy-MM-dd}.log</FileNamePattern>
+                <maxHistory>${LOG_HIS_MAX}</maxHistory>
+                <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            </rollingPolicy>
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+        
+        <appender name="PRE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>ERROR</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <FileNamePattern>${LOG_PATH}/error.%d{yyyy-MM-dd}.log</FileNamePattern>
+                <maxHistory>${LOG_HIS_MAX}</maxHistory>
+                <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            </rollingPolicy>
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+        
+        <root>
+            <appender-ref ref="PRE_INFO"/>
+            <appender-ref ref="PRE_ERROR"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+    	<property name="LOG_PATH" value="/var/logs/${APP_NAME}"/>
+        <appender name="PROD_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>INFO</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <FileNamePattern>${LOG_PATH}/info.%d{yyyy-MM-dd}.log</FileNamePattern>
+                <maxHistory>${LOG_HIS_MAX}</maxHistory>
+                <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            </rollingPolicy>
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+        
+        <appender name="PROD_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>ERROR</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <FileNamePattern>${LOG_PATH}/error.%d{yyyy-MM-dd}.log</FileNamePattern>
+                <maxHistory>${LOG_HIS_MAX}</maxHistory>
+                <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            </rollingPolicy>
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+        
+        <root>
+            <appender-ref ref="PROD_INFO"/>
+            <appender-ref ref="PROD_ERROR"/>
+        </root>
+    </springProfile>
+</configuration>
